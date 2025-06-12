@@ -146,20 +146,29 @@ void handle_trp(uint16_t instr) {
         trap_halt,
     };
 
+    uint8_t trap_idx = (instr & 0xFF) - TRP_OFFSET;
+
+    // ensure trap routine exists
+    if (trap_idx >= NUM_TRAP) {
+        fprintf(stderr, "Invalid trap vector: 0x%02X\n", trap_idx);
+        abort();
+    }
+
     // save PC position in R7
     // N.B: do I need to update the cond flags?
     registers[R_R7] = registers[R_PC];
 
     // call correspondent trap routine
-    routines[instr & 0xFF]();
+    routines[trap_idx]();
 }
 
 void handle_res(uint16_t instr) {
+    fprintf(stderr, "[ERROR] Unimplemented opcode: 0x%04X at PC=0x%04X\n", instr, registers[R_PC] - 1);
     abort();
 }
 
 void handle_rti(uint16_t instr) {
+    fprintf(stderr, "[ERROR] Reserved instruction: 0x%04X at PC=0x%04X\n", instr, registers[R_PC] - 1);
     abort();
 }
-
 

@@ -4,3 +4,4 @@
 
 #define PC_START 0x3000
 
+#define TRP_OFFSET 0x20

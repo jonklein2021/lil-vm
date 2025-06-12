@@ -14,6 +14,8 @@ int main(int argc, char **argv) {
         usage();
         exit(2);
     }
+   
+    puts("[lil-vm] Reading images...");
 
     // read images from argument list
     for (int i = 1; i < argc; i++) {
@@ -33,30 +35,38 @@ int main(int argc, char **argv) {
     signal(SIGINT, handle_interrupt);
     disable_input_buffering();
 
+    puts("[lil-vm] Running instructions...");
+
     // array of operation handler functions
     void (*handlers[OP_COUNT])(uint16_t) = {
-        handle_add,
-        handle_and,
-        handle_not,
-        handle_br,
-        handle_jmp,
-        handle_jsr,
-        handle_ld,
-        handle_ldi,
-        handle_ldr,
-        handle_lea,
-        handle_st,
-        handle_sti,
-        handle_str,
-        handle_trp,
-        handle_res,
-        handle_rti
+        handle_br, // branch
+        handle_add, // add
+        handle_ld, // load
+        handle_st, // store
+        handle_jsr, // jump register
+        handle_and, // bitwise and
+        handle_ldr, // load (memory to register)
+        handle_str, // store (register to memory)
+        handle_rti, // unused
+        handle_not, // bitwise not
+        handle_ldi, // load indirect
+        handle_sti, // store indirect
+        handle_jmp, // jump
+        handle_res, // reserved (unused)
+        handle_lea, // load effective address
+        handle_trp, // execute trap
     };
 
     while (running) { // running is a global var so trap routines can access it
         // fetch instruction and get correspondent operation
         uint16_t instr = mem_read(registers[R_PC]++);
-        uint16_t op = instr >> 12;
+        uint16_t op = (instr >> 12) & 0xF; // ops are 4-bits each
+    
+        // ensure operation is in array bounds
+        if (op >= OP_COUNT) {
+            fprintf(stderr, "Unknown opcode 0x%X at PC=0x%X\n", instr, registers[R_PC] - 1);
+            abort();
+        }
 
         // perform correspondent operation
         handlers[op](instr);
