@@ -29,6 +29,10 @@ int main(int argc, char **argv) {
     // initialize PC
     registers[R_PC] = PC_START;
 
+    // disable input buffering
+    signal(SIGINT, handle_interrupt);
+    disable_input_buffering();
+
     // array of operation handler functions
     void (*handlers[OP_COUNT])(uint16_t) = {
         handle_add,
@@ -49,7 +53,7 @@ int main(int argc, char **argv) {
         handle_rti
     };
 
-    while (1) {
+    while (running) { // running is a global var so trap routines can access it
         // fetch instruction and get correspondent operation
         uint16_t instr = mem_read(registers[R_PC]++);
         uint16_t op = instr >> 12;
@@ -57,6 +61,7 @@ int main(int argc, char **argv) {
         // perform correspondent operation
         handlers[op](instr);
     }
-    
+
+    restore_input_buffering();    
 }
 

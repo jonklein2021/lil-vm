@@ -69,6 +69,6 @@ void trap_putsp() {
 void trap_halt() {
     puts("HALT");
     fflush(stdout);
-    exit(0); // indicate graceful exit
+    running = 0; // this is the global variable controlling main loop
 }
 

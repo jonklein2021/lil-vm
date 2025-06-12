@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include "common.h"
 #include "condflags.h"
+#include "keyboard.h"
 
 // Extends x to num_bits (up to 16); for negative numbers,
 // this entails filling the most significant bits w/ 1s
@@ -55,7 +56,14 @@ int read_image(const char *path) {
 }
 
 uint16_t mem_read(uint16_t address) {
-    // TODO: Handle memory-mapped registers
+    if (address == MR_KBSR) {
+        if (check_key()) {
+            memory[MR_KBSR] = (1 << 15);
+            memory[MR_KBDR] = getchar();
+        } else {
+            memory[MR_KBSR] = 0;
+        }
+    }
     return memory[address];
 }
 

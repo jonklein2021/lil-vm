@@ -1,5 +1,6 @@
 #pragma once
 
+// standard registers
 enum {
     R_R0,
     R_R1,
@@ -14,4 +15,8 @@ enum {
     R_COUNT,
 };
 
-
+// memory-mapped registers
+enum {
+    MR_KBSR = 0xFE00, // keyboard status
+    MR_KBDR = 0xFE02  // keyboard data
+};
