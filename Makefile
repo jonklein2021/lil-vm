@@ -1,4 +1,8 @@
 all:
-	gcc src/lc3.c -I src/include -o lc3.exe
+	@echo Compiling...
+	@gcc src/lc3.c -I src/include -o lc3.exe
+	@echo Done!
 clean:
-	rm *.exe
+	@echo Cleaning...
+	@rm -f *.exe
+	@echo Done!

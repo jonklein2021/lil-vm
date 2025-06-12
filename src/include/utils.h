@@ -5,7 +5,7 @@
 #include "condflags.h"
 #include "keyboard.h"
 
-// Extends x to num_bits (up to 16); for negative numbers,
+// extends x to num_bits (up to 16); for negative numbers,
 // this entails filling the most significant bits w/ 1s
 uint16_t sign_extend(uint16_t x, int num_bits) {
     if ((x >> (num_bits - 1)) & 1) {
@@ -19,7 +19,7 @@ uint16_t swap16(uint16_t x) {
     return (x << 8) | (x >> 8);
 }
 
-// Updates the flag register after the register
+// updates the flag register after the register
 // r has been updated to its current value
 void update_flags(uint16_t r) {
     if (registers[r] == 0)
