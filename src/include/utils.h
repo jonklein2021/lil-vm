@@ -13,6 +13,11 @@ uint16_t sign_extend(uint16_t x, int num_bits) {
     return x;
 }
 
+// converts a word to the other endian
+uint16_t swap16(uint16_t x) {
+    return (x << 8) | (x >> 8);
+}
+
 // Updates the flag register after the register
 // r has been updated to its current value
 void update_flags(uint16_t r) {
@@ -24,8 +29,28 @@ void update_flags(uint16_t r) {
         registers[R_COND] = FL_POS;
 }
 
-// TODO: This
-uint16_t read_image(const char *path) {
+// loads an LC3 image file into memory 
+int read_image(const char *path) {
+    FILE *file = fopen(path, "rb");
+    if (!file) return 0;
+    
+    // location in memory to place the image
+    uint16_t origin;
+    fread(&origin, sizeof(origin), 1, file);
+    origin = swap16(origin); // comment this out on big endian machines
+
+    uint16_t max_read = MEMORY_MAX - origin;
+    uint16_t* p = memory + origin;
+    size_t num_bytes = fread(p, sizeof(uint16_t), max_read, file);
+
+    // convert to big endian; comment this loop out
+    // on exotic machines running big endian already
+    while (num_bytes-- > 0) {
+        *p = swap16(*p);
+        ++p;
+    }
+
+    fclose(file);
     return 1;
 }
 

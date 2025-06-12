@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include "common.h"
 #include "condflags.h"
+#include "trapcodes.h"
+#include "traproutines.h"
 #include "utils.h"
 
 void handle_add(uint16_t instr) {
@@ -43,7 +45,7 @@ void handle_not(uint16_t instr) {
     uint16_t r_input = (instr >> 6) & 0x7;
 
     registers[r_dest] = ~registers[r_input];
-    update_flags(registers[r_dest]);
+    update_flags(r_dest);
 }
 
 void handle_br(uint16_t instr) {
@@ -135,7 +137,21 @@ void handle_str(uint16_t instr) {
 }
 
 void handle_trp(uint16_t instr) {
-    
+    void (*routines[NUM_TRAP])() = {
+        trap_getc,
+        trap_out,
+        trap_puts,
+        trap_in,
+        trap_putsp,
+        trap_halt,
+    };
+
+    // save PC position in R7
+    // N.B: do I need to update the cond flags?
+    registers[R_R7] = registers[R_PC];
+
+    // call correspondent trap routine
+    routines[instr & 0xFF]();
 }
 
 void handle_res(uint16_t instr) {
